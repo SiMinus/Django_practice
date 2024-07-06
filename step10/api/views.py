@@ -22,8 +22,10 @@ class GetRoom(APIView):
         code = request.GET.get(self.lookup_url_kwarg)
         if code != None:
             room = Room.objects.filter(code=code)
-            # avoid the situation guest can still get into the room without joining after leaving
-            if len(room) > 0 and 'room_code' in self.request.session:
+            
+            if len(room) > 0 :
+                # improve direct joining room from the endpoint
+                self.request.session['room_code'] = code
                 data = RoomSerializer(room[0]).data
                 data['is_host'] = self.request.session.session_key == room[0].host
                 return Response(data, status=status.HTTP_200_OK)
