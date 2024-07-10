@@ -10,6 +10,7 @@ from requests import Request, post
 from .util import *
 
 class AuthURL(APIView):
+
     def get(self, request, format=None):
         force_auth = request.GET.get('force_auth', 'false').lower() == 'true'
         scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
@@ -28,7 +29,6 @@ class AuthURL(APIView):
     
 def spotify_callback(request, format=None):
     code = request.GET.get('code')
-    error = request.GET.get('error')
 
     response = post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'authorization_code',
@@ -50,13 +50,14 @@ def spotify_callback(request, format=None):
     update_or_create_user_tokens(request.session.session_key, access_token, refresh_token, token_type, expires_in)
 
     return redirect('frontend:')
+    
 
-
-class IsAuthenticated(APIView):
+class isAuthenticated(APIView):
     def get(self, request, format=None):
         is_authenticated = is_spotify_authenticated(self.request.session.session_key)
         return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
-    
+
+
 class CurrentSong(APIView):
     def get(self, request, format=None):
         room_code = self.request.session.get('room_code')
@@ -65,12 +66,13 @@ class CurrentSong(APIView):
             room = room[0]
         else:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
+        
         host = room.host
         endpoint = 'player/currently-playing'
-        response = execute_spotify_request(host, endpoint)
-        
+        response = execute_spotify_api_request(host, endpoint)
+
         if 'error' in response or 'item' not in response:
-            return Response({}, status=status.HTTP_204_NO_CONTENT)
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
         
         item = response.get('item')
         duration = item.get('duration_ms')
@@ -106,9 +108,9 @@ class PlaySong(APIView):
         room = Room.objects.get(code=room_code)
         if self.request.session.session_key == room.host or room.guest_can_pause:
             response = play_song(room.host)
-            return Response(response, status.HTTP_200_OK)
+            return Response(response, status=status.HTTP_200_OK)
         
-        return Response({'msg': 'No access right'}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'msg': 'No Access Right'}, status=status.HTTP_403_FORBIDDEN)
     
 class PauseSong(APIView):
     def put(self, response, format=None):
@@ -116,6 +118,6 @@ class PauseSong(APIView):
         room = Room.objects.get(code=room_code)
         if self.request.session.session_key == room.host or room.guest_can_pause:
             response = pause_song(room.host)
-            return Response(response, status.HTTP_200_OK)
+            return Response(response, status=status.HTTP_200_OK)
         
-        return Response({'msg': 'No access right'}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'msg': 'No Access Right'}, status=status.HTTP_403_FORBIDDEN)
