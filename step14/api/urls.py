@@ -1,5 +1,9 @@
+
 from django.urls import path
 from . import views
+
+
+
 
 urlpatterns = [
     
@@ -10,4 +14,5 @@ urlpatterns = [
     path('user-in-room', views.UserInRoom.as_view()),
     path('leave-room', views.LeaveRoom.as_view()),
     path('update-room', views.UpdateRoom.as_view()),
+
 ]

@@ -11,28 +11,27 @@ import PauseIcon from '@mui/icons-material/Pause'
 import SkipNextIcon from '@mui/icons-material/SkipNext'
 
 
-function MusicPlayer (props) {
+function MusicPlayer(props) {
 
-    const { title, artist, image_url, duration, time, is_playing } = props.song;
-    
-    const songProgress = (time / duration) * 100;
+    const { title, artist, image_url, duration, time, is_playing} = props.song
+    const songProgress = (time / duration) * 100
 
-    return (
-        <Card style={{ padding: '16px', margin: '16px', maxWidth: '400px', height: '150px' }}>
-            <Grid container spacing={1} alignItems="center">
-                <Grid item xs={4} align="center">
-                    <img src={image_url} alt="Album Cover" style={{ width: '100%', height: 'auto', borderRadius: '8px' }} />
+    return(
+        <Card style={{ paddingTop: '6px', paddingLeft: '6px', marginTop: '16px' }}>
+            <Grid container alignItems='center'>
+                <Grid item align="center" xs={4}>
+                    <img src={image_url} style={{ height: "100%", width: "100%", borderRadius: '8px' }} />
                 </Grid>
-                <Grid item xs={8} align="center">
-                    <Typography variant="h5" component="h5">
+                <Grid item align="center" xs={8}>
+                    <Typography component="h5" variant="h5">
                         {title}
                     </Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
+                    <Typography color="textSecondary" variant="subtitle1">
                         {artist}
                     </Typography>
-                    <div >
+                    <div>
                         <IconButton>
-                            {is_playing ? <PauseIcon /> : <PlayArrowIcon />}
+                            {is_playing ? <PauseIcon/> : <PlayArrowIcon />}
                         </IconButton>
                         <IconButton>
                             <SkipNextIcon />
@@ -40,10 +39,9 @@ function MusicPlayer (props) {
                     </div>
                 </Grid>
             </Grid>
-            <LinearProgress variant="determinate" value={songProgress} style={{ marginTop: '16px' }} />
+            <LinearProgress variant="determinate" value={songProgress} />
         </Card>
-    );
-
+    )
 
 
 }

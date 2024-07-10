@@ -4,9 +4,10 @@ import HomePage from './HomePage';
 
 function App() {
     return (
-        <div className="center">
+        <div className='center'>
             <HomePage/>
         </div>
+    
     );
 }
 
@@ -15,3 +16,4 @@ const root = createRoot(container);
 root.render(<App />);
 
 export default App;
+
