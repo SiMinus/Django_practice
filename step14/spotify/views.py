@@ -8,11 +8,11 @@ from rest_framework import status
 
 from requests import Request, post
 from .util import *
+# Create your views here.
 
 class AuthURL(APIView):
-
     def get(self, request, format=None):
-        force_auth = request.GET.get('force_auth', 'false').lower() == 'true'
+        force_auth = request.GET.get('force_auth', 'false').lower() =='true'
         scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
 
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
@@ -40,22 +40,26 @@ def spotify_callback(request, format=None):
 
     access_token = response.get('access_token')
     refresh_token = response.get('refresh_token')
-    token_type = response.get('token_type')
     expires_in = response.get('expires_in')
+    token_type = response.get('token_type')
     error = response.get('error')
 
     if not request.session.exists(request.session.session_key):
         request.session.create()
 
-    update_or_create_user_tokens(request.session.session_key, access_token, refresh_token, token_type, expires_in)
-
+    update_or_create_user_tokens(request.session.session_key, access_token, refresh_token,
+                                 expires_in, token_type)
     return redirect('frontend:')
-    
 
-class isAuthenticated(APIView):
+class IsAuthenticated(APIView):
     def get(self, request, format=None):
-        is_authenticated = is_spotify_authenticated(self.request.session.session_key)
-        return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
+        room_code = self.request.session.get('room_code')
+        room = Room.objects.get(code=room_code)
+        if self.request.session.session_key == room.host:
+            is_authenticated = is_spotify_authenticated(self.request.session.session_key)
+            return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
+        
+        return Response({'status': True}, status=status.HTTP_200_OK)
 
 
 class CurrentSong(APIView):
@@ -85,7 +89,7 @@ class CurrentSong(APIView):
 
         for i, artist in enumerate(item.get('artists')):
             if i > 0:
-                artist_string += ", "
+                artist_string += ', '
             name = artist.get('name')
             artist_string += name
 
